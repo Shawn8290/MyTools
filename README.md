@@ -1,49 +1,33 @@
-# MyTools
+# MyTools 實用網頁小工具集 🧰
 
-A collection of useful tools and utilities built with web technologies.
+這是一個基於純前端技術（HTML + JS + CSS）開發的實用工具集。所有的檔案處理與轉換都在使用者的瀏覽器本地端完成，無需上傳至任何後端伺服器，不僅轉換速度快，也能絕對確保您的檔案隱私與安全性。
 
-## 🛠️ About
-
-MyTools is a project featuring various tools and utilities. The project is built primarily with web technologies including JavaScript, HTML, and CSS.
-
-## 📊 Technology Stack
-
-- **JavaScript** - 65.6%
-- **HTML** - 28%
-- **CSS** - 6.4%
-
-## 🚀 Getting Started
-
-1. Clone the repository:
-```bash
-git clone https://github.com/Shawn8290/MyTools.git
-```
-
-2. Navigate to the project directory:
-```bash
-cd MyTools
-```
-
-3. Open the project in your browser or IDE to start using the tools.
-
-## 📝 Features
-
-- Interactive web-based tools
-- Clean and intuitive user interface
-- Responsive design
-
-## 🤝 Contributing
-
-Feel free to fork this repository and submit pull requests with improvements or new features.
-
-## 📄 License
-
-This project is open source and available under the MIT License.
-
-## 👤 Author
-
-[Shawn8290](https://github.com/Shawn8290)
+👉 **線上網頁版 (GitHub Pages)**：[https://shawn8290.github.io/MyTools/](https://shawn8290.github.io/MyTools/)
 
 ---
 
-Happy coding! 🎉
+## 🛠️ 核心功能簡介
+
+### 1. PDF 轉 JPG 工具 (PDF to JPG)
+快速將多頁 PDF 檔案轉換為高品質的 JPG 圖片。
+* **本地端高畫質解析**：採用 PDF.js 進行渲染（設定 scale = 2.0），確保輸出的圖片維持極佳的清晰度。
+* **自動 ZIP 打包下載**：為解決瀏覽器安全機制阻擋多重下載的問題，系統會自動將轉換後的所有圖片依序補零命名（如 `Page_001.jpg`、`Page_002.jpg`），並使用 JSZip 打包成單一 ZIP 壓縮檔，讓您一鍵下載、解壓縮後排序不混亂。
+
+### 2. MP4 轉 GIF 工具 (MP4 to GIF)
+將短影音 MP4 檔案轉換為 GIF 動畫，並支援強大的前端「去背」功能。
+* **自訂去背容差**：提供「啟用背景去背」選項，能將接近白色的背景轉為透明（Alpha = 0）。內建滑桿可自由調整白色容差值（150-255），精準適應不同影片的失真程度。
+* **高效能背景運算**：使用 `gif.js` 結合本地端的 Web Worker 進行編碼運算，確保在逐格擷取與生成 GIF 的密集運算過程中，網頁操作依然保持流暢不卡頓。
+
+---
+
+## 💻 技術架構
+* **純前端實作**：HTML5, CSS3, Vanilla JavaScript (無框架)
+* **單頁應用程式 (SPA)**：透過 JavaScript `fetch` 動態載入功能模組與 HTML，無須重新整理頁面即可切換工具。
+* **響應式設計 (RWD)**：支援桌機與手機瀏覽，內建左側收摺選單。
+* **使用的開源函式庫**：
+  * `pdf.js`：讀取與渲染 PDF 頁面。
+  * `jszip`：在前端生成與壓縮 ZIP 檔案。
+  * `gif.js` (含 worker)：影片畫格擷取與 GIF 動畫編碼。
+
+## 👤 作者
+[Shawn8290](https://github.com/Shawn8290)
