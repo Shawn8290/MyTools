@@ -1,14 +1,19 @@
 (function() {
-    // --- 1. 動態載入 PDF.js 核心與 Worker ---
+    // --- 1. 動態載入 PDF.js 與 JSZip ---
     if (typeof pdfjsLib === 'undefined') {
         const script = document.createElement('script');
         script.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
         script.onload = () => {
-            // 必須設定 Worker 路徑才能正常解析 PDF
             pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-            console.log("PDF.js 載入完成");
         };
         document.head.appendChild(script);
+    }
+    
+    // 加入 JSZip 來打包檔案
+    if (typeof JSZip === 'undefined') {
+        const zipScript = document.createElement('script');
+        zipScript.src = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+        document.head.appendChild(zipScript);
     }
 
     // --- 2. 綁定 DOM 元素 ---
@@ -24,36 +29,18 @@
 
     // --- 3. UI 互動與檔案選擇邏輯 ---
     if (dropArea && fileInput) {
-        // 點擊區域觸發 input
         dropArea.addEventListener('click', () => fileInput.click());
-
-        // 拖曳效果
-        dropArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropArea.style.borderColor = '#3498db';
-            dropArea.style.backgroundColor = '#ebf8ff';
-        });
-        dropArea.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            dropArea.style.borderColor = '#cbd5e0';
-            dropArea.style.backgroundColor = '#f7fafc';
-        });
+        dropArea.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.style.borderColor = '#3498db'; });
+        dropArea.addEventListener('dragleave', (e) => { e.preventDefault(); dropArea.style.borderColor = '#cbd5e0'; });
         dropArea.addEventListener('drop', (e) => {
             e.preventDefault();
             dropArea.style.borderColor = '#cbd5e0';
-            dropArea.style.backgroundColor = '#f7fafc';
-            
             if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                const file = e.dataTransfer.files[0];
-                handleFileSelection(file);
+                handleFileSelection(e.dataTransfer.files[0]);
             }
         });
-
-        // 一般選擇檔案
         fileInput.addEventListener('change', (e) => {
-            if (e.target.files && e.target.files.length > 0) {
-                handleFileSelection(e.target.files[0]);
-            }
+            if (e.target.files && e.target.files.length > 0) handleFileSelection(e.target.files[0]);
         });
     }
 
@@ -64,7 +51,6 @@
             currentFile = null;
             return;
         }
-
         currentFile = file;
         fileInfo.innerHTML = `📄 已選擇：${file.name} (大小: ${(file.size / 1024 / 1024).toFixed(2)} MB)`;
         convertBtn.style.display = 'block';
@@ -73,88 +59,84 @@
         progressBar.style.width = '0%';
     }
 
-    // --- 4. 核心轉換邏輯 ---
+    // --- 4. 核心轉換與 ZIP 打包邏輯 ---
     if (convertBtn) {
         convertBtn.addEventListener('click', async () => {
             if (!currentFile) return;
 
-            if (typeof pdfjsLib === 'undefined') {
-                statusMsg.innerHTML = '<span style="color:#e53e3e;">⏳ 系統正在載入 PDF 處理模組，請稍候再試。</span>';
+            if (typeof pdfjsLib === 'undefined' || typeof JSZip === 'undefined') {
+                statusMsg.innerHTML = '<span style="color:#e53e3e;">⏳ 系統正在載入處理模組，請稍候幾秒再試。</span>';
                 return;
             }
 
-            // UI 狀態切換
             convertBtn.disabled = true;
             convertBtn.style.opacity = '0.5';
             progressWrapper.style.display = 'block';
-            statusMsg.innerHTML = '正在讀取 PDF 檔案...';
             progressBar.style.width = '5%';
 
             try {
-                // 將 File 物件轉為 ArrayBuffer
                 const arrayBuffer = await currentFile.arrayBuffer();
-                
-                // 載入 PDF 文件
                 const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
                 const totalPages = pdf.numPages;
                 
-                statusMsg.innerHTML = `檔案讀取成功，共 ${totalPages} 頁。開始處理...`;
-
-                // 取出檔名 (去除 .pdf 副檔名)
                 const baseFileName = currentFile.name.replace(/\.pdf$/i, '');
+                
+                // 初始化 ZIP 物件
+                const zip = new JSZip();
+                const imgFolder = zip.folder(baseFileName);
 
-                // 逐頁處理
+                statusMsg.innerHTML = `檔案讀取成功，共 ${totalPages} 頁。開始轉換圖片...`;
+
                 for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
-                    // 更新進度條
-                    const progress = Math.round((pageNum / totalPages) * 100);
+                    const progress = Math.round((pageNum / totalPages) * 80); // 留 20% 給 ZIP 打包進度
                     progressBar.style.width = `${progress}%`;
                     statusMsg.innerHTML = `正在轉換第 ${pageNum} 頁，共 ${totalPages} 頁...`;
 
                     const page = await pdf.getPage(pageNum);
-                    
-                    // 設定縮放比例 (scale = 2.0 可以獲得較好的圖片解析度)
                     const viewport = page.getViewport({ scale: 2.0 });
                     
-                    // 建立隱藏的 Canvas
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
                     canvas.height = viewport.height;
                     canvas.width = viewport.width;
 
-                    // 為了避免透明背景變成黑色，先填滿白色
                     ctx.fillStyle = '#FFFFFF';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                    // 將 PDF 頁面渲染到 Canvas
-                    const renderContext = {
-                        canvasContext: ctx,
-                        viewport: viewport
-                    };
-                    
-                    await page.render(renderContext).promise;
+                    await page.render({ canvasContext: ctx, viewport: viewport }).promise;
 
-                    // 將 Canvas 轉為 JPG 格式的 DataURL (0.9 為壓縮品質)
                     const imgData = canvas.toDataURL('image/jpeg', 0.9);
-
-                    // 建立下載連結並觸發點擊
-                    const link = document.createElement('a');
-                    link.href = imgData;
-                    link.download = `${baseFileName}_頁面_${pageNum}.jpg`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-
-                    // 加入短暫延遲 (300毫秒)，避免瀏覽器因瞬間觸發太多下載而崩潰或嚴格阻擋
-                    await new Promise(resolve => setTimeout(resolve, 300));
+                    
+                    // 去除 DataURL 開頭的 "data:image/jpeg;base64," 字串，只保留純 Base64 資料
+                    const base64Data = imgData.replace(/^data:image\/(png|jpeg);base64,/, "");
+                    
+                    // 將該頁面的 Base64 資料塞入 ZIP 資料夾中
+                    // 為了確保檔案排序正確，補零處理 (例如 01, 02... 而不是 1, 10, 2)
+                    const padNum = String(pageNum).padStart(3, '0'); 
+                    imgFolder.file(`Page_${padNum}.jpg`, base64Data, {base64: true});
                 }
 
-                statusMsg.innerHTML = '<span style="color:#38b2ac; font-weight:bold;">✅ 轉換與下載完成！</span>';
+                statusMsg.innerHTML = "圖片轉換完畢，正在壓縮打包成 ZIP 檔...";
+                progressBar.style.width = '90%';
+
+                // 產生 ZIP 檔案 Blob
+                const content = await zip.generateAsync({type:"blob"});
+                
+                // 觸發單次下載
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(content);
+                link.download = `${baseFileName}_JPG轉換.zip`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                progressBar.style.width = '100%';
+                statusMsg.innerHTML = '<span style="color:#38b2ac; font-weight:bold;">✅ 轉換與打包完成！已經為您下載 ZIP 壓縮檔。</span>';
                 
             } catch (error) {
-                console.error("PDF 轉換錯誤:", error);
-                statusMsg.innerHTML = `<span style="color:#e53e3e;">❌ 轉換過程中發生錯誤：${error.message}</span>`;
+                console.error("處理錯誤:", error);
+                statusMsg.innerHTML = `<span style="color:#e53e3e;">❌ 處理過程中發生錯誤：${error.message}</span>`;
             } finally {
-                // 恢復按鈕狀態
                 convertBtn.disabled = false;
                 convertBtn.style.opacity = '1';
             }
