@@ -1,0 +1,40 @@
+<style>
+    .mp4-container { max-width: 600px; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+    .mp4-container h2 { color: #2b6cb0; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+    .setting-group { margin: 15px 0; padding: 15px; background: #f7fafc; border-radius: 8px; }
+    .checkbox-label { display: flex; align-items: center; font-weight: bold; cursor: pointer; color: #2d3748; font-size: 1.05rem; }
+    .checkbox-label input { width: 18px; height: 18px; margin-right: 10px; cursor: pointer; }
+    #preview-canvas { max-width: 100%; border: 1px dashed #ccc; background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYBDMogOdBOwioVgwEgWjBpigwAANkQIFcZ8dDkAAAAASUVORK5CYII='); }
+</style>
+
+<div class="tool-section mp4-container">
+    <h2>MP4 轉 GIF (含去背選項)</h2>
+    
+    <input type="file" id="videoUpload" accept="video/mp4" style="width: 100%; padding: 10px; margin-bottom: 10px;">
+    
+    <div class="setting-group">
+        <label class="checkbox-label">
+            <input type="checkbox" id="transparent-bg" checked> 
+            啟用背景去背 (將白色轉為透明)
+        </label>
+        
+        <div id="tolerance-group" style="margin-top: 15px;">
+            <label>白色容差值 (0-255，數值越大越嚴格)：</label>
+            <input type="range" id="tolerance" min="150" max="255" value="230" style="width: 100%;">
+            <div style="text-align: right; font-weight: bold; color: #4a5568;"><span id="tolerance-val">230</span></div>
+        </div>
+    </div>
+
+    <button id="startConvertBtn" class="btn" style="width: 100%; display: none;">開始轉換 GIF</button>
+    
+    <div id="status-msg" style="margin-top: 15px; color: #e53e3e; font-weight: bold;"></div>
+
+    <h3 style="margin-top: 20px;">處理預覽：</h3>
+    <video id="hidden-video" style="display: none;" muted playsinline></video>
+    <canvas id="preview-canvas"></canvas>
+    
+    <div id="result-area" style="margin-top: 20px; display: none;">
+        <h3>完成的 GIF：</h3>
+        <img id="result-gif" style="max-width: 100%;">
+    </div>
+</div>
