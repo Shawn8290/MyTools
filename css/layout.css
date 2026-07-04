@@ -1,18 +1,42 @@
+/* 1. 統一改為上下排列（按鈕在上，內容在下） */
 .app-container {
     display: flex;
+    flex-direction: column; 
     min-height: 100vh;
 }
 
-.sidebar {
-    width: 250px;
-    background-color: #ffffff;
-    border-right: 1px solid var(--border-color);
-    padding: 20px 0;
+/* 2. 選單按鈕永遠顯示 */
+.mobile-menu-btn {
+    display: block; 
+    background-color: var(--primary-color, #2b6cb0);
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
+/* 3. 側邊欄改為全寬下拉選單，預設隱藏 */
+.sidebar {
+    width: 100%;
+    display: none; 
+    background-color: #ffffff;
+    border-bottom: 2px solid var(--border-color, #e2e8f0);
+    padding: 10px 0;
+}
+
+/* 4. 當被 JS 加上 open 屬性時才會顯示 */
+.sidebar.open {
+    display: block;
+}
+
+/* 隱藏重複的標題讓畫面更乾淨 */
 .sidebar h2 {
-    padding: 0 20px;
-    font-size: 1.2rem;
+    display: none; 
 }
 
 .sidebar ul {
@@ -29,56 +53,16 @@
     transition: background-color 0.2s;
 }
 
+/* 點擊或懸停時的視覺回饋 */
 .sidebar li a:hover, .sidebar li a.active {
     background-color: #ebf8ff;
     color: var(--primary-color);
-    border-right: 4px solid var(--primary-color);
+    border-left: 4px solid var(--primary-color);
 }
 
+/* 右側(下方)內容區 */
 .main-content {
     flex: 1;
-    padding: 30px;
+    padding: 20px;
     background-color: var(--background-color);
-}
-
-/* 手機版選單按鈕 (預設在桌機版隱藏) */
-.mobile-menu-btn {
-    display: none;
-    background-color: var(--primary-color, #2b6cb0);
-    color: white;
-    border: none;
-    padding: 15px 20px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    width: 100%;
-    text-align: left;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-/* 當螢幕寬度小於 768px 時觸發手機版排版 */
-@media (max-width: 768px) {
-    .app-container {
-        flex-direction: column; /* 從左右排列改成上下排列 */
-    }
-
-    .mobile-menu-btn {
-        display: block; /* 顯示手機版按鈕 */
-    }
-
-    .sidebar {
-        width: 100%;
-        display: none; /* 預設把選單藏起來 */
-        border-right: none;
-        border-bottom: 2px solid var(--border-color, #e2e8f0);
-    }
-
-    /* 當 JS 替 sidebar 加上 'open' 類別時，選單就會顯示 */
-    .sidebar.open {
-        display: block;
-    }
-
-    .main-content {
-        padding: 15px; /* 手機版的內距縮小，保留更多空間給工具 */
-    }
 }
