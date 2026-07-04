@@ -1,0 +1,86 @@
+<style>
+    /* PDF 轉 JPG 專屬樣式 */
+    .pdf-container {
+        max-width: 600px;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    .pdf-container h2 {
+        color: var(--primary-color, #2b6cb0);
+        margin-top: 0;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+    }
+    .pdf-container .file-drop-area {
+        border: 2px dashed var(--border-color, #cbd5e0);
+        padding: 40px 20px;
+        text-align: center;
+        border-radius: 8px;
+        background-color: #f7fafc;
+        cursor: pointer;
+        transition: border-color 0.3s, background-color 0.3s;
+        margin-bottom: 15px;
+    }
+    .pdf-container .file-drop-area:hover {
+        border-color: #3498db;
+        background-color: #ebf8ff;
+    }
+    .pdf-container .file-drop-area p {
+        margin: 0;
+        color: #4a5568;
+        font-size: 1.1rem;
+    }
+    .pdf-container #pdf-file-info {
+        font-weight: bold;
+        color: #2d3748;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .pdf-container .progress-wrapper {
+        width: 100%;
+        background-color: #e2e8f0;
+        border-radius: 6px;
+        overflow: hidden;
+        margin-top: 15px;
+        display: none;
+    }
+    .pdf-container .progress-bar {
+        height: 12px;
+        width: 0%;
+        background-color: #38b2ac;
+        transition: width 0.3s;
+    }
+    .pdf-container #pdf-status {
+        margin-top: 10px;
+        font-size: 0.95rem;
+        color: #4a5568;
+        text-align: center;
+    }
+</style>
+
+<div class="tool-section pdf-container">
+    <h2>PDF 轉 JPG 工具</h2>
+    
+    <div class="file-drop-area" id="pdfDropArea">
+        <p>📥 點擊選擇，或將 PDF 檔案拖曳至此處</p>
+        <input type="file" id="pdfUpload" accept=".pdf" style="display: none;">
+    </div>
+    
+    <div id="pdf-file-info"></div>
+
+    <button id="pdfConvertBtn" class="btn" style="width: 100%; padding: 14px; font-size: 16px; display: none;">開始轉換並下載</button>
+
+    <div class="progress-wrapper" id="progressWrapper">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    
+    <div id="pdf-status"></div>
+    
+    <div style="margin-top:20px; font-size:0.85em; color:#718096; line-height:1.5;">
+        * <strong>瀏覽器安全性提醒</strong>：若頁數較多，瀏覽器可能會跳出「是否允許下載多個檔案」的提示，請點選「允許」。<br>
+        * 轉換過程完全在您的設備上進行，檔案不會上傳至任何伺服器。
+    </div>
+</div>
