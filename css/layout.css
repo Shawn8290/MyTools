@@ -40,3 +40,45 @@
     padding: 30px;
     background-color: var(--background-color);
 }
+
+/* 手機版選單按鈕 (預設在桌機版隱藏) */
+.mobile-menu-btn {
+    display: none;
+    background-color: var(--primary-color, #2b6cb0);
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* 當螢幕寬度小於 768px 時觸發手機版排版 */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column; /* 從左右排列改成上下排列 */
+    }
+
+    .mobile-menu-btn {
+        display: block; /* 顯示手機版按鈕 */
+    }
+
+    .sidebar {
+        width: 100%;
+        display: none; /* 預設把選單藏起來 */
+        border-right: none;
+        border-bottom: 2px solid var(--border-color, #e2e8f0);
+    }
+
+    /* 當 JS 替 sidebar 加上 'open' 類別時，選單就會顯示 */
+    .sidebar.open {
+        display: block;
+    }
+
+    .main-content {
+        padding: 15px; /* 手機版的內距縮小，保留更多空間給工具 */
+    }
+}
