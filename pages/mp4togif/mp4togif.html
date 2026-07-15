@@ -15,13 +15,14 @@
     <div class="setting-group">
         <label class="checkbox-label">
             <input type="checkbox" id="transparent-bg" checked> 
-            啟用背景去背 (將白色轉為透明)
+            啟用背景去背 (只移除與外框相連的白色背景)
         </label>
         
         <div id="tolerance-group" style="margin-top: 15px;">
-            <label>白色容差值 (0-255，數值越大越嚴格)：</label>
-            <input type="range" id="tolerance" min="150" max="255" value="230" style="width: 100%;">
-            <div style="text-align: right; font-weight: bold; color: #4a5568;"><span id="tolerance-val">230</span></div>
+            <label>背景色差容差（數值越大，去除範圍越廣）：</label>
+            <input type="range" id="tolerance" min="5" max="80" value="28" style="width: 100%;">
+            <div style="text-align: right; font-weight: bold; color: #4a5568;"><span id="tolerance-val">28</span></div>
+            <small style="display: block; margin-top: 6px; color: #718096;">建議先用 28；若仍有白邊可調高，若主體邊緣被削除則調低。</small>
         </div>
     </div>
 
